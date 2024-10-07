@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="GPTClip.h" />
+    <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="registry.h" />
     <ClInclude Include="Resource.h" />
@@ -137,6 +138,7 @@
     <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="login.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="registry.c" />
     <ClCompile Include="tray.c" />

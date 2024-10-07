@@ -2,7 +2,7 @@
 #include "tray.h"
 #include "registry.h"
 #include "resource.h"
-
+#include "login.h"
 #include "ui.h"
 
 HINSTANCE hInst;
@@ -13,12 +13,17 @@ HWND hApiKeyInput, hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput
 HWND hGetApiKeyButton;
 HWND hStartButton;
 HWND hExitButton;
+HINSTANCE hInst; // Variable para almacenar la instancia de la aplicación
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
+	//crear ventana de login y esperar a que el usuario inicie sesión
+	CreateLoginWindow(hInstance); // Función en `login.c`
+
+    
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
