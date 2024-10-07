@@ -1,13 +1,20 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
-#include <windows.h>
 
-void CreateLoginWindow(HINSTANCE hInstance);
-BOOL loginRequest(const char* username, const char* password);
+#define USERNAME_LEN 50
+#define PASSWORD_LEN 50
+#define ID_USERNAME 101
+#define ID_PASSWORD 102
+#define ID_LOGIN_BUTTON 103
 
-// Variables globales
-extern HWND hUsernameInput, hPasswordInput;
+#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
+
+
 extern BOOL isLoginSuccessful;
+
+
+LRESULT CALLBACK LoginWndProc(HWND, UINT, WPARAM, LPARAM);
+BOOL loginRequest(const char* username, const char* password);
 
 #endif // LOGIN_H

@@ -69,5 +69,8 @@
     <Image Include="res\gpt_icon.ico">
       <Filter>Archivos de recursos</Filter>
     </Image>
+    <Image Include="res\login.ico">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
   </ItemGroup>
 </Project>

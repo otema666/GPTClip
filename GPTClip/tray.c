@@ -1,6 +1,5 @@
 #include "tray.h"
 #include "resource.h"
-#include "registry.h"
 
 NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
 BOOL trayIconActive = FALSE;
