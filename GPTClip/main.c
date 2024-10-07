@@ -1,39 +1,23 @@
-#include "framework.h"
-#include "GPTClip.h"
-#include <windowsx.h>
-#include <shellapi.h>
+#include "main.h"
+#include "tray.h"
+#include "registry.h"
+#include "resource.h"
 
-#define MAX_LOADSTRING 100
-#define WM_TRAYICON (WM_USER + 1)
+#include "ui.h"
 
-// Variables globales:
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 
-// Variables para los controles
 HWND hApiKeyInput, hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput, hPromptModeComboBox;
-
-// Declaraciones de funciones adelantadas:
-ATOM MyRegisterClass(HINSTANCE hInstance);
-BOOL InitInstance(HINSTANCE, int);
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
-
-// Para el tray icon
-NOTIFYICONDATA nid = { sizeof(NOTIFYICONDATA) };
-HMENU hTrayMenu;
-BOOL trayIconActive = FALSE;
-
-void AddTrayIcon(HWND hWnd);
-void RemoveTrayIcon();
-void ShowContextMenu(HWND hWnd, POINT pt);
-void ToggleTrayIcon(HWND hWnd, BOOL enable);
+HWND hGetApiKeyButton;
+HWND hStartButton;
+HWND hExitButton;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+    _In_ LPWSTR lpCmdLine,
+    _In_ int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -80,7 +64,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     hInst = hInstance;
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, 0, 400, 300, NULL, NULL, hInstance, NULL);
+        CW_USEDEFAULT, 0, 450, 430, NULL, NULL, hInstance, NULL);
 
     if (!hWnd) {
         return FALSE;
@@ -88,58 +72,48 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
 
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
+
+    LoadAPIKeyFromRegistry(hApiKeyInput); // Función en `registry.c`
+
     return TRUE;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    WCHAR apiKey[256];
+
     switch (message) {
     case WM_CREATE:
-        // Crear controles
-        CreateWindowW(L"STATIC", L"API Key:", WS_VISIBLE | WS_CHILD,
-            10, 10, 100, 20, hWnd, NULL, hInst, NULL);
-        hApiKeyInput = CreateWindowW(L"EDIT", L"", WS_VISIBLE | WS_CHILD | WS_BORDER,
-            120, 10, 200, 20, hWnd, NULL, hInst, NULL);
-
-        hSendNotificationsCheck = CreateWindowW(L"BUTTON", L"Send Notifications",
-            WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX, 10, 40, 150, 20, hWnd, NULL, hInst, NULL);
-
-        hMinimizeToTrayCheck = CreateWindowW(L"BUTTON", L"Minimize to Tray",
-            WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX, 10, 70, 150, 20, hWnd, NULL, hInst, NULL);
-
-        CreateWindowW(L"STATIC", L"Shortcut Key:", WS_VISIBLE | WS_CHILD,
-            10, 100, 100, 20, hWnd, NULL, hInst, NULL);
-        hShortcutInput = CreateWindowW(L"EDIT", L"", WS_VISIBLE | WS_CHILD | WS_BORDER,
-            120, 100, 100, 20, hWnd, NULL, hInst, NULL);
-
-        CreateWindowW(L"STATIC", L"Prompt Mode:", WS_VISIBLE | WS_CHILD,
-            10, 130, 100, 20, hWnd, NULL, hInst, NULL);
-        hPromptModeComboBox = CreateWindowW(L"COMBOBOX", NULL,
-            WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST, 120, 130, 200, 100, hWnd, NULL, hInst, NULL);
-        SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Test Mode (Multiple Response)");
-        SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Development Mode (Long Responses)");
-        SendMessage(hPromptModeComboBox, CB_SETCURSEL, 0, 0); // Seleccionar la primera opción por defecto
-        break;
-
-    case WM_COMMAND:
-        switch (LOWORD(wParam)) {
-        case IDM_EXIT:
-            DestroyWindow(hWnd);
-            break;
-        }
+        CreateUI(hWnd); // Función en `ui.c`
         break;
 
     case WM_CLOSE:
-        if (IsDlgButtonChecked(hWnd, hMinimizeToTrayCheck)) {
-            ShowWindow(hWnd, SW_HIDE);
-            AddTrayIcon(hWnd);
+        ShowWindow(hWnd, SW_HIDE);
+        AddTrayIcon(hWnd);
+        break;
+
+    
+    case WM_COMMAND:
+
+        if ((HWND)lParam == hGetApiKeyButton) {
+            ShellExecute(NULL, L"open", L"https://platform.openai.com/api-keys", NULL, NULL, SW_SHOWNORMAL);
+        }
+        else if ((HWND)lParam == hStartButton) {
+            HandleTrayMenuCommand(wParam, hWnd);
+
+        }
+        else if ((HWND)lParam == hExitButton) {
+            DestroyWindow(hWnd);
         }
         else {
-            DestroyWindow(hWnd);
+            HandleTrayMenuCommand(wParam, hWnd);
         }
         break;
 
     case WM_DESTROY:
-        RemoveTrayIcon();
+        GetWindowTextW(hApiKeyInput, apiKey, 256);  
+        SaveAPIKeyToRegistry(apiKey); // Función en `registry.c`
+
+        RemoveTrayIcon(); // Función en `tray.c`
         PostQuitMessage(0);
         break;
 
@@ -147,7 +121,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         if (lParam == WM_RBUTTONDOWN) {
             POINT pt;
             GetCursorPos(&pt);
-            ShowContextMenu(hWnd, pt);
+            ShowContextMenu(hWnd, pt); // Función en `tray.c`
         }
         break;
 
@@ -155,30 +129,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
-}
-
-void AddTrayIcon(HWND hWnd) {
-    nid.hWnd = hWnd;
-    nid.uID = 100;
-    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-    nid.uCallbackMessage = WM_TRAYICON;
-    wcscpy_s(nid.szTip, sizeof(nid.szTip) / sizeof(wchar_t), L"GPTClip");
-    nid.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
-    Shell_NotifyIcon(NIM_ADD, &nid);
-    trayIconActive = TRUE;
-}
-
-void RemoveTrayIcon() {
-    if (trayIconActive) {
-        Shell_NotifyIcon(NIM_DELETE, &nid);
-        trayIconActive = FALSE;
-    }
-}
-
-void ShowContextMenu(HWND hWnd, POINT pt) {
-    hTrayMenu = CreatePopupMenu();
-    AppendMenu(hTrayMenu, MF_STRING, IDM_EXIT, L"Exit");
-    SetForegroundWindow(hWnd);  // Necesario para asegurar que el menú se muestra correctamente
-    TrackPopupMenu(hTrayMenu, TPM_RIGHTBUTTON, pt.x, pt.y, 0, hWnd, NULL);
-    DestroyMenu(hTrayMenu);
 }

@@ -129,19 +129,24 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="GPTClip.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="registry.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="tray.h" />
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="registry.c" />
+    <ClCompile Include="tray.c" />
+    <ClCompile Include="ui.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GPTClip.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="GPTClip.ico" />
     <Image Include="res\gpt_icon.ico" />
-    <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
