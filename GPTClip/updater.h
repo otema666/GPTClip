@@ -1,6 +1,9 @@
-#ifndef UPDATE_H
-#define UPDATE_H
+#ifndef UPDATER_H
+#define UPDATER_H
 
+#include <windows.h>
+
+void CreateErrorWindow(LPCWSTR message);
 void check_for_updates();
-void CreateErrorWindow(LPCWSTR errorMessage);
-#endif
+
+#endif // UPDATER_H

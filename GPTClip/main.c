@@ -4,6 +4,7 @@
 #include "login.h"
 #include "ui.h"
 #include "updater.h"
+#include "shortcut.h"
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -21,8 +22,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	check_for_updates(); // Función en `updater.c`
 	CreateLoginWindow(hInstance); // Función en `login.c`
+    HANDLE hThread = CreateThread(NULL, 0, monitor_keys, NULL, 0, NULL);
 
-    
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
