@@ -127,10 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="api.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GPTClip.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="prompts\prompts.h" />
     <ClInclude Include="registry.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -138,8 +140,11 @@
     <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="api.c" />
     <ClCompile Include="login.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="notifications.c" />
+    <ClCompile Include="prompts\prompts.c" />
     <ClCompile Include="registry.c" />
     <ClCompile Include="tray.c" />
     <ClCompile Include="ui.c" />
