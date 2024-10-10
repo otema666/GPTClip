@@ -12,6 +12,7 @@ HWND hUsernameInput;
 HWND hPasswordInput;
 HINSTANCE hInst;
 BOOL isLoginSuccessful = FALSE;
+char loggedInUsername[USERNAME_LEN] = "";  // Definición de la variable
 
 void CenterWindow(HWND hWnd) {
     RECT rc;
@@ -191,6 +192,8 @@ BOOL loginRequest(const char* username, const char* password) {
 
                         if (strstr(pszOutBuffer, "\"status\":\"success\"")) {
                             isLoginSuccessful = TRUE;
+                            strncpy(loggedInUsername, username, USERNAME_LEN);
+
                         }
                         
                     }

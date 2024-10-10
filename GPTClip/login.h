@@ -12,7 +12,7 @@
 
 
 extern BOOL isLoginSuccessful;
-
+extern char loggedInUsername[USERNAME_LEN];
 
 LRESULT CALLBACK LoginWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL loginRequest(const char* username, const char* password);

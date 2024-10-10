@@ -33,9 +33,6 @@
     <ClInclude Include="tray.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="registry.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="ui.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
@@ -54,9 +51,6 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="tray.c">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
-    <ClCompile Include="registry.c">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="ui.c">

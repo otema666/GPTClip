@@ -133,7 +133,6 @@
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="prompts\prompts.h" />
-    <ClInclude Include="registry.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tray.h" />
@@ -145,7 +144,6 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="notifications.c" />
     <ClCompile Include="prompts\prompts.c" />
-    <ClCompile Include="registry.c" />
     <ClCompile Include="tray.c" />
     <ClCompile Include="ui.c" />
   </ItemGroup>

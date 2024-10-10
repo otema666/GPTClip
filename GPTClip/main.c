@@ -1,6 +1,5 @@
 #include "main.h"
 #include "tray.h"
-#include "registry.h"
 #include "resource.h"
 #include "login.h"
 #include "ui.h"
@@ -9,8 +8,7 @@ HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
 
-HWND hApiKeyInput, hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput, hPromptModeComboBox;
-HWND hGetApiKeyButton;
+HWND hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput, hPromptModeComboBox;
 HWND hStartButton;
 HWND hExitButton;
 HINSTANCE hInst;
@@ -77,13 +75,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
-    LoadAPIKeyFromRegistry(hApiKeyInput); // Función en `registry.c`
 
     return TRUE;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    WCHAR apiKey[256];
 
     switch (message) {
     case WM_CREATE:
@@ -98,10 +94,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     
     case WM_COMMAND:
 
-        if ((HWND)lParam == hGetApiKeyButton) {
-            ShellExecute(NULL, L"open", L"https://platform.openai.com/api-keys", NULL, NULL, SW_SHOWNORMAL);
-        }
-        else if ((HWND)lParam == hStartButton) {
+        if ((HWND)lParam == hStartButton) {
             HandleTrayMenuCommand(wParam, hWnd);
 
         }
@@ -114,9 +107,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         break;
 
     case WM_DESTROY:
-        GetWindowTextW(hApiKeyInput, apiKey, 256);  
-        SaveAPIKeyToRegistry(apiKey); // Función en `registry.c`
-
         RemoveTrayIcon(); // Función en `tray.c`
         PostQuitMessage(0);
         break;
