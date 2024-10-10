@@ -137,6 +137,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="tray.h" />
     <ClInclude Include="ui.h" />
+    <ClInclude Include="updater.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="api.c" />
@@ -146,6 +147,7 @@
     <ClCompile Include="prompts\prompts.c" />
     <ClCompile Include="tray.c" />
     <ClCompile Include="ui.c" />
+    <ClCompile Include="updater.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GPTClip.rc" />
@@ -153,6 +155,7 @@
   <ItemGroup>
     <Image Include="res\gpt_icon.ico" />
     <Image Include="res\login.ico" />
+    <Image Include="res\update.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

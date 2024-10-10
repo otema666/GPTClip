@@ -3,6 +3,7 @@
 #include "resource.h"
 #include "login.h"
 #include "ui.h"
+#include "updater.h"
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -17,7 +18,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
-{   
+{
+	check_for_updates(); // Función en `updater.c`
 	CreateLoginWindow(hInstance); // Función en `login.c`
 
     

@@ -45,6 +45,9 @@
     <ClInclude Include="prompts\prompts.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="updater.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -68,6 +71,9 @@
     <ClCompile Include="prompts\prompts.c">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="updater.c">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GPTClip.rc">
@@ -79,6 +85,9 @@
       <Filter>Archivos de recursos</Filter>
     </Image>
     <Image Include="res\login.ico">
+      <Filter>Archivos de recursos</Filter>
+    </Image>
+    <Image Include="res\update.ico">
       <Filter>Archivos de recursos</Filter>
     </Image>
   </ItemGroup>
