@@ -86,7 +86,7 @@ void check_for_updates() {
 
     if (strcmp(APP_VERSION, server_version) != 0) {
 		wchar_t message[100];
-		swprintf(message, 100, L"La versión %hs está disponible. Por favor, actualiza la app.", server_version);
+		swprintf(message, 100, L"La versión % hs está disponible. Por favor, presiona Aceptar para actualizar la app.", server_version);
 
 		CreateErrorWindow(message);
         exit(1);
@@ -100,8 +100,11 @@ void check_for_updates() {
 
 
 void CreateErrorWindow(LPCWSTR errorMessage) {
-    int result = MessageBox(NULL, errorMessage, L"¡Actualización disponible!", MB_OK | MB_ICONERROR);
+    int result = MessageBox(NULL, errorMessage, L"¡Actualización disponible!", MB_OKCANCEL | MB_ICONERROR);
+
     if (result == IDOK) {
-        ShellExecute(NULL, L"open", L"https://github.com/otema666/gptClip/releases/latest/download/gptClip.exe", NULL, NULL, SW_SHOWNORMAL);
+        ShellExecute(NULL, L"open", L"https://github.com/otema666/gptClip/releases/latest/download/GPTClip.exe", NULL, NULL, SW_SHOWNORMAL);
     }
+
+    exit(1);
 }
