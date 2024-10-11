@@ -56,7 +56,8 @@ void check_for_updates() {
 
     if (dwStatusCode == 200) {
         if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-            CreateErrorWindow(L"Error al consultar los datos disponibles.");
+            CreateErrorWindow(L"");
+            MessageBox(NULL, L"Error de red", L"GPTClip Error", MB_OK | MB_ICONERROR);
         }
         else if (dwSize > 0) {
             pszOutBuffer = (LPSTR)malloc(dwSize + 1);
@@ -68,7 +69,7 @@ void check_for_updates() {
             ZeroMemory(pszOutBuffer, dwSize + 1);
 
             if (!WinHttpReadData(hRequest, (LPVOID)pszOutBuffer, dwSize, &dwDownloaded)) {
-                CreateErrorWindow(L"Error al leer los datos.");
+                MessageBox(NULL, L"Error de red", L"GPTClip Error", MB_OK | MB_ICONERROR);
             }
             else {
                 strncpy(server_version, pszOutBuffer, dwDownloaded);
@@ -80,7 +81,7 @@ void check_for_updates() {
         }
     }
     else {
-        CreateErrorWindow(L"Error: no se pudo conectar con el servidor.");
+        MessageBox(NULL, L"Necesitas estar conectado a internet!", L"Error de Red", MB_OK | MB_ICONERROR);
         exit(1);
     }
 

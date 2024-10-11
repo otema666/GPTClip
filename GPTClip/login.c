@@ -160,48 +160,59 @@ BOOL loginRequest(const char* username, const char* password) {
     }
 
     snprintf(data, sizeof(data), "username=%s&password=%s", username, password);
-
     LPCWSTR headers = L"Content-Type: application/x-www-form-urlencoded";
 
     bResults = WinHttpSendRequest(hRequest, headers, (DWORD)-1L, (LPVOID)data, strlen(data), strlen(data), 0);
-    if (bResults) {
-        bResults = WinHttpReceiveResponse(hRequest, NULL);
+    if (!bResults) {
+        DWORD errorCode = GetLastError();
+        if (errorCode == ERROR_WINHTTP_CANNOT_CONNECT) {
+            MessageBox(NULL, L"No se pudo conectar al servidor. Revisa tu conexión a Internet.", L"Error de conexión", MB_OK | MB_ICONERROR);
+        }
+        else {
+            MessageBox(NULL, L"Error al enviar la solicitud HTTP", L"Error", MB_OK | MB_ICONERROR);
+        }
+        WinHttpCloseHandle(hRequest);
+        WinHttpCloseHandle(hConnect);
+        WinHttpCloseHandle(hSession);
+        return FALSE;
+    }
 
-        if (bResults) {
-            do {
-                dwSize = 0;
-                if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-                    MessageBox(NULL, L"Error al consultar datos disponibles", L"Error", MB_OK | MB_ICONERROR);
+    bResults = WinHttpReceiveResponse(hRequest, NULL);
+    if (bResults) {
+        do {
+            dwSize = 0;
+            if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
+                MessageBox(NULL, L"Error al consultar datos disponibles", L"Error", MB_OK | MB_ICONERROR);
+                break;
+            }
+
+            if (dwSize > 0) {
+                pszOutBuffer = (LPSTR)malloc(dwSize + 1);
+                if (!pszOutBuffer) {
+                    MessageBox(NULL, L"Error de memoria", L"Error", MB_OK | MB_ICONERROR);
                     break;
                 }
 
-                if (dwSize > 0) {
-                    pszOutBuffer = (LPSTR)malloc(dwSize + 1);
-                    if (!pszOutBuffer) {
-                        MessageBox(NULL, L"Error de memoria", L"Error", MB_OK | MB_ICONERROR);
-                        break;
-                    }
+                ZeroMemory(pszOutBuffer, dwSize + 1);
 
-                    ZeroMemory(pszOutBuffer, dwSize + 1);
+                if (!WinHttpReadData(hRequest, (LPVOID)pszOutBuffer, dwSize, &dwDownloaded)) {
+                    MessageBox(NULL, L"Error al leer los datos", L"Error", MB_OK | MB_ICONERROR);
+                }
+                else {
+                    pszOutBuffer[dwSize] = '\0';
 
-                    if (!WinHttpReadData(hRequest, (LPVOID)pszOutBuffer, dwSize, &dwDownloaded)) {
-                        MessageBox(NULL, L"Error al leer los datos", L"Error", MB_OK | MB_ICONERROR);
+                    if (strstr(pszOutBuffer, "\"status\":\"success\"")) {
+                        isLoginSuccessful = TRUE;
+                        strncpy(loggedInUsername, username, USERNAME_LEN);
                     }
                     else {
-                        pszOutBuffer[dwSize] = '\0';
-
-                        if (strstr(pszOutBuffer, "\"status\":\"success\"")) {
-                            isLoginSuccessful = TRUE;
-                            strncpy(loggedInUsername, username, USERNAME_LEN);
-
-                        }
-                        
+                        isLoginSuccessful = FALSE;
                     }
-
-                    free(pszOutBuffer);
                 }
-            } while (dwSize > 0);
-        }
+
+                free(pszOutBuffer);
+            }
+        } while (dwSize > 0);
     }
 
     WinHttpCloseHandle(hRequest);
