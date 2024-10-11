@@ -5,6 +5,7 @@
 
 HWND hStartButton;
 HWND hExitButton;
+HWND hHelpButton;
 
 void CreateUI(HWND hWnd) {
     HBRUSH hBrush = CreateSolidBrush(RGB(240, 240, 240));
@@ -22,8 +23,7 @@ void CreateUI(HWND hWnd) {
 
     CreateWindowW(L"STATIC", L"Atajo del teclado:", WS_VISIBLE | WS_CHILD,
         10, 40, 120, 20, hWnd, NULL, hInst, NULL);
-    hShortcutInput = CreateWindowW(L"EDIT", L"",
-        WS_VISIBLE | WS_CHILD | WS_BORDER | ES_AUTOHSCROLL | WS_EX_COMPOSITED,
+    CreateWindowW(L"STATIC", L"<CTRL + ALT + 0>", WS_VISIBLE | WS_CHILD,
         130, 40, 180, 20, hWnd, NULL, hInst, NULL);
 
     CreateWindowW(L"STATIC", L"Tipo de respuestas:", WS_VISIBLE | WS_CHILD,
@@ -47,5 +47,7 @@ void CreateUI(HWND hWnd) {
     hExitButton = CreateWindowW(L"BUTTON", L"Salir",
         WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
         230, 330, 100, 30, hWnd, NULL, hInst, NULL);
-
+	hHelpButton = CreateWindowW(L"BUTTON", L"Ayuda",
+		WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
+		10, 160, 60, 20, hWnd, NULL, hInst, NULL);
 }
