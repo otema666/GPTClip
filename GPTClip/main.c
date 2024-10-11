@@ -5,6 +5,7 @@
 #include "ui.h"
 #include "updater.h"
 #include "shortcut.h"
+#include "help.h"
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -13,6 +14,8 @@ WCHAR szWindowClass[MAX_LOADSTRING];
 HWND hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput, hPromptModeComboBox;
 HWND hStartButton;
 HWND hExitButton;
+HWND hHelpButton;
+
 HINSTANCE hInst;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -22,7 +25,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	check_for_updates(); // Función en `updater.c`
 	CreateLoginWindow(hInstance); // Función en `login.c`
-    HANDLE hThread = CreateThread(NULL, 0, monitor_keys, NULL, 0, NULL);
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -96,18 +98,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
     
     case WM_COMMAND:
+        if (HIWORD(wParam) == BN_CLICKED) {
+            if ((HWND)lParam == hStartButton) {
+                EnableWindow(hStartButton, FALSE);
+                SetWindowText(hStartButton, L"Iniciado");
+                ShowWindow(hWnd, SW_HIDE);
+                AddTrayIcon(hWnd);
+                HANDLE hThread = CreateThread(NULL, 0, monitor_keys, NULL, 0, NULL);
 
-        if ((HWND)lParam == hStartButton) {
-            HandleTrayMenuCommand(wParam, hWnd);
+            }
+            else if ((HWND)lParam == hExitButton) {
+                DestroyWindow(hWnd);
+            }
+            else if ((HWND)lParam == hHelpButton) {
+                EnableWindow(hHelpButton, FALSE);
+                SetWindowText(hHelpButton, L"Espere...");
+                launch_help_img();
+                SetWindowText(hHelpButton, L"Ayuda");
+				EnableWindow(hHelpButton, TRUE);
 
+            }
+            else {
+                HandleTrayMenuCommand(wParam, hWnd);
+            }
         }
-        else if ((HWND)lParam == hExitButton) {
-            DestroyWindow(hWnd);
-        }
-        else {
-            HandleTrayMenuCommand(wParam, hWnd);
-        }
+
         break;
+
 
     case WM_DESTROY:
         RemoveTrayIcon(); // Función en `tray.c`
@@ -127,3 +144,5 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
     }
     return 0;
 }
+
+

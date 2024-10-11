@@ -8,7 +8,7 @@
 #define SERVER_PORT 443
 #pragma warning(disable : 4996)
 
-LPSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
+LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
     BOOL bResults = FALSE;
     DWORD dwSize = 0;
@@ -16,15 +16,27 @@ LPSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     LPSTR pszOutBuffer = NULL;
     DWORD dwStatusCode = 0;
     DWORD dwStatusCodeSize = sizeof(dwStatusCode);
-    char* response = (char*)malloc(256);
-
+    wchar_t* response = (wchar_t*)malloc(512 * sizeof(wchar_t)); // Ajusta el tamaño si es necesario
+    
     if (response == NULL) {
         CreateErrorWindow(L"Memoria insuficiente.");
         return NULL;
     }
 
-    wchar_t path[256];
-    swprintf(path, 256, L"gptClip/gptApi.php?prompt=%s&question=%s", prompt, question);
+    size_t prompt_len = wcslen(prompt);
+    size_t question_len = wcslen(question);
+    size_t total_len = prompt_len + question_len + wcslen(L"gptClip/gptApi.php?prompt=&question=") + 1; // +1 para el terminador nulo
+
+    // Asignar memoria dinámica
+    wchar_t* path = (wchar_t*)malloc(total_len * sizeof(wchar_t));
+    if (path == NULL) {
+        wprintf(L"Error al asignar memoria\n");
+        free(response);
+        return NULL; // Manejo de error
+    }
+
+    // Formatear la cadena
+    swprintf(path, total_len, L"gptClip/gptApi.php?prompt=%ls&question=%ls", prompt, question);
 
     hSession = WinHttpOpen(L"gptClip", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
 
@@ -69,8 +81,16 @@ LPSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
                 return NULL;
             }
             else {
-                strncpy(response, pszOutBuffer, dwDownloaded);
-                response[dwDownloaded] = '\0';
+                // Convertir de UTF-8 (char*) a UTF-16 (wchar_t*)
+                int requiredSize = MultiByteToWideChar(CP_UTF8, 0, pszOutBuffer, dwDownloaded, NULL, 0);
+                if (requiredSize > 0) {
+                    MultiByteToWideChar(CP_UTF8, 0, pszOutBuffer, dwDownloaded, response, requiredSize);
+                    response[requiredSize] = L'\0';  // Termina la cadena correctamente
+                    MessageBoxW(NULL, response, L"respuesta correcta:", MB_OK);
+                }
+                else {
+                    CreateErrorWindow(L"Error al convertir los datos a wchar_t.");
+                }
             }
 
             free(pszOutBuffer);
@@ -88,4 +108,28 @@ LPSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     if (hSession) WinHttpCloseHandle(hSession);
     free(response);
     return NULL;
+}
+
+char* url_encode(const wchar_t* str) {
+    const wchar_t* hex = L"0123456789ABCDEF";
+    size_t len = wcslen(str);
+    char* encoded = (char*)malloc(len * 3 + 1); // Cada carácter puede ocupar hasta 3 bytes
+    if (!encoded) return NULL;
+
+    char* p = encoded;
+    for (size_t i = 0; i < len; i++) {
+        wchar_t c = str[i];
+        if (c >= L'A' && c <= L'Z' || c >= L'a' && c <= L'z' || c >= L'0' && c <= L'9') {
+            *p++ = (char)c; // Caracteres seguros se copian directamente
+        }
+        else {
+            *p++ = '%';
+            *p++ = hex[(c >> 12) & 0xF];
+            *p++ = hex[(c >> 8) & 0xF];
+            *p++ = hex[(c >> 4) & 0xF];
+            *p++ = hex[c & 0xF];
+        }
+    }
+    *p = '\0'; // Terminación nula
+    return encoded;
 }

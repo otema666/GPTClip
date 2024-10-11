@@ -1,7 +1,8 @@
-#ifndef PROMPTS
-#define PROMPTS
+#ifndef PROMPTS_H
+#define PROMPTS_H
 
-extern const char* prompt_test;
-extern const char* prompt_LongAnswer;
+// Declaración de constantes de tipo wchar_t
+extern const wchar_t* prompt_test;
+extern const wchar_t* prompt_LongAnswer;
 
-#endif // PROMPTS
+#endif // PROMPTS_H

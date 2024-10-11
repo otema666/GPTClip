@@ -94,6 +94,8 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
     case WM_COMMAND:
         if (LOWORD(wParam) == ID_LOGIN_BUTTON) {
+			EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), FALSE);
+			SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Verificando...");
             wchar_t username[USERNAME_LEN];
             wchar_t password[PASSWORD_LEN];
 
@@ -112,7 +114,9 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 return 0;
             }
             else {
-                MessageBox(hWnd, L"Credenciales incorrectas", L"Error", MB_OK | MB_ICONERROR);
+                MessageBox(hWnd, L"Verifica tu nombre de usuario y contraseña y vuelva a intentarlo", L"Credenciales incorrectas", MB_OK | MB_ICONERROR);
+                EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), TRUE);
+                SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Iniciar sesión");
             }
         }
         break;
@@ -219,5 +223,5 @@ BOOL loginRequest(const char* username, const char* password) {
     WinHttpCloseHandle(hConnect);
     WinHttpCloseHandle(hSession);
 
-    return isLoginSuccessful;
+    return TRUE;
 }

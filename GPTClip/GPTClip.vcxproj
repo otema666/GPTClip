@@ -130,6 +130,7 @@
     <ClInclude Include="api.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GPTClip.h" />
+    <ClInclude Include="help.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="prompts\prompts.h" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="api.c" />
+    <ClCompile Include="help.c" />
     <ClCompile Include="login.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="notifications.c" />

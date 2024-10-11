@@ -49,5 +49,5 @@ void CreateUI(HWND hWnd) {
         230, 330, 100, 30, hWnd, NULL, hInst, NULL);
 	hHelpButton = CreateWindowW(L"BUTTON", L"Ayuda",
 		WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
-		10, 160, 60, 20, hWnd, NULL, hInst, NULL);
+		10, 160, 70, 20, hWnd, NULL, hInst, NULL);
 }
