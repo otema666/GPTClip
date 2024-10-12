@@ -17,9 +17,9 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     DWORD dwStatusCode = 0;
     DWORD dwStatusCodeSize = sizeof(dwStatusCode);
     wchar_t* response = (wchar_t*)malloc(512 * sizeof(wchar_t)); // Ajusta el tamaño si es necesario
-    
+
     if (response == NULL) {
-        CreateErrorWindow(L"Memoria insuficiente.");
+        MessageBox(NULL, L"Memoria insuficiente.", L"Error de memoria", MB_OK | MB_ICONERROR);
         return NULL;
     }
 
@@ -30,7 +30,8 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     // Asignar memoria dinámica
     wchar_t* path = (wchar_t*)malloc(total_len * sizeof(wchar_t));
     if (path == NULL) {
-        wprintf(L"Error al asignar memoria\n");
+        MessageBox(NULL, L"Error al asignar memoria.", L"Error de asignación memoria", MB_OK | MB_ICONERROR);
+
         free(response);
         return NULL; // Manejo de error
     }
@@ -62,12 +63,12 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
 
     if (dwStatusCode == 200) {
         if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-            CreateErrorWindow(L"Error al consultar los datos disponibles.");
+            MessageBox(NULL, L"Error al consultar los datos disponibles.", L"Error de datos", MB_OK | MB_ICONERROR);
         }
         else if (dwSize > 0) {
             pszOutBuffer = (LPSTR)malloc(dwSize + 1);
             if (!pszOutBuffer) {
-                CreateErrorWindow(L"Memoria insuficiente.");
+                MessageBox(NULL, L"Memoria insuficiente.", L"Error de memoria", MB_OK | MB_ICONERROR);
                 free(response);
                 return NULL;
             }
@@ -75,7 +76,7 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
             ZeroMemory(pszOutBuffer, dwSize + 1);
 
             if (!WinHttpReadData(hRequest, (LPVOID)pszOutBuffer, dwSize, &dwDownloaded)) {
-                CreateErrorWindow(L"Error al leer los datos.");
+                MessageBox(NULL, L"Error al leer los datos.", L"Error", MB_OK | MB_ICONERROR);
                 free(pszOutBuffer);
                 free(response);
                 return NULL;
@@ -84,12 +85,22 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
                 // Convertir de UTF-8 (char*) a UTF-16 (wchar_t*)
                 int requiredSize = MultiByteToWideChar(CP_UTF8, 0, pszOutBuffer, dwDownloaded, NULL, 0);
                 if (requiredSize > 0) {
-                    MultiByteToWideChar(CP_UTF8, 0, pszOutBuffer, dwDownloaded, response, requiredSize);
-                    response[requiredSize] = L'\0';  // Termina la cadena correctamente
-                    MessageBoxW(NULL, response, L"respuesta correcta:", MB_OK);
+                    wchar_t* wideResponse = (wchar_t*)malloc((requiredSize + 1) * sizeof(wchar_t));
+                    if (!wideResponse) {
+                        MessageBox(NULL, L"Memoria insuficiente para respuesta.", L"Error de memoria", MB_OK | MB_ICONERROR);
+                        free(pszOutBuffer);
+                        free(response);
+                        return NULL;
+                    }
+                    MultiByteToWideChar(CP_UTF8, 0, pszOutBuffer, dwDownloaded, wideResponse, requiredSize);
+                    wideResponse[requiredSize] = L'\0';
+
+                    // Copiar al buffer original
+                    wcscpy(response, wideResponse);
+                    free(wideResponse);
                 }
                 else {
-                    CreateErrorWindow(L"Error al convertir los datos a wchar_t.");
+                    MessageBox(NULL, L"Error al convertir los datos a wchar_t.", L"Error", MB_OK | MB_ICONERROR);
                 }
             }
 
@@ -98,7 +109,7 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
         }
     }
     else {
-        CreateErrorWindow(L"Error: no se pudo conectar con el servidor.");
+        MessageBox(NULL, L"No se pudo conectar con el servidor.", L"Error", MB_OK | MB_ICONERROR);
         free(response);
         return NULL;
     }
@@ -111,7 +122,7 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
 }
 
 char* url_encode(const wchar_t* str) {
-    const wchar_t* hex = L"0123456789ABCDEF";
+    const char* hex = "0123456789ABCDEF";
     size_t len = wcslen(str);
     char* encoded = (char*)malloc(len * 3 + 1); // Cada carácter puede ocupar hasta 3 bytes
     if (!encoded) return NULL;
@@ -119,13 +130,11 @@ char* url_encode(const wchar_t* str) {
     char* p = encoded;
     for (size_t i = 0; i < len; i++) {
         wchar_t c = str[i];
-        if (c >= L'A' && c <= L'Z' || c >= L'a' && c <= L'z' || c >= L'0' && c <= L'9') {
+        if ((c >= L'A' && c <= L'Z') || (c >= L'a' && c <= L'z') || (c >= L'0' && c <= L'9')) {
             *p++ = (char)c; // Caracteres seguros se copian directamente
         }
         else {
             *p++ = '%';
-            *p++ = hex[(c >> 12) & 0xF];
-            *p++ = hex[(c >> 8) & 0xF];
             *p++ = hex[(c >> 4) & 0xF];
             *p++ = hex[c & 0xF];
         }
