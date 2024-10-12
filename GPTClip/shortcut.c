@@ -2,71 +2,60 @@
 #include <windows.h>
 #include <string.h>
 #include <time.h>
+#include <wchar.h>
 #include "api.h"
 #include "shortcut.h"
 #include "ui.h"
 #include "prompts/prompts.h"
 #pragma warning(disable : 4996)
 
-char* respuesta = NULL;
+wchar_t* respuesta = NULL;
 time_t last_hotkey_time = 0;
-
-char* utf8_to_ansi(const char* utf8) {
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, utf8, -1, NULL, 0);
-    wchar_t* wstr = (wchar_t*)malloc(size_needed * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, utf8, -1, wstr, size_needed);
-
-    size_needed = WideCharToMultiByte(CP_ACP, 0, wstr, -1, NULL, 0, NULL, NULL);
-    char* ansi = (char*)malloc(size_needed);
-    WideCharToMultiByte(CP_ACP, 0, wstr, -1, ansi, size_needed, NULL, NULL);
-
-    free(wstr);
-    return ansi;
-}
 
 wchar_t* get_paper_clip() {
     if (!OpenClipboard(NULL)) {
-        return NULL; // No se pudo abrir el portapapeles
+        return NULL;
     }
 
-    HGLOBAL hGlob = GetClipboardData(CF_UNICODETEXT); // Usamos CF_UNICODETEXT
+    HGLOBAL hGlob = GetClipboardData(CF_UNICODETEXT);
     if (hGlob == NULL) {
         CloseClipboard();
-        return NULL; // No hay datos en el portapapeles
+        return NULL;
     }
 
-    wchar_t* pBuf = (wchar_t*)GlobalLock(hGlob); // Leemos el contenido como wchar_t*
+    wchar_t* pBuf = (wchar_t*)GlobalLock(hGlob);
     if (pBuf == NULL) {
         CloseClipboard();
-        return NULL; // No se pudo bloquear
+        return NULL;
     }
 
-    wchar_t* clipContent = _wcsdup(pBuf); // Duplicamos el contenido
+    wchar_t* clipContent = _wcsdup(pBuf);
 
     GlobalUnlock(hGlob);
     CloseClipboard();
 
-    return clipContent; // Retornamos el texto Unicode
+    return clipContent;
 }
 
 void post_paper_clip(const wchar_t* text) {
-    if (!OpenClipboard(NULL)) {
-        return; // No se pudo abrir el portapapeles
+    if (OpenClipboard(NULL)) {
+        EmptyClipboard();
+
+        HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, (wcslen(text) + 1) * sizeof(wchar_t));
+        if (hGlob) {
+            wchar_t* pGlobal = (wchar_t*)GlobalLock(hGlob);
+            if (pGlobal) {
+                wmemcpy(pGlobal, text, wcslen(text) + 1);
+                GlobalUnlock(hGlob);
+                SetClipboardData(CF_UNICODETEXT, hGlob);
+            }
+        }
+
+        CloseClipboard();
     }
-
-    EmptyClipboard();
-
-    size_t len = wcslen(text) + 1;
-    HGLOBAL hGlob = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(wchar_t));
-    if (hGlob) {
-        wchar_t* pBuf = (wchar_t*)GlobalLock(hGlob);
-        wcscpy(pBuf, text); // Copiamos el texto Unicode
-        GlobalUnlock(hGlob);
-
-        SetClipboardData(CF_UNICODETEXT, hGlob); // Usamos CF_UNICODETEXT
+    else {
+        MessageBoxW(NULL, L"No se pudo abrir el portapapeles.", L"Error", MB_OK | MB_ICONERROR);
     }
-
-    CloseClipboard();
 }
 
 
@@ -83,51 +72,46 @@ DWORD WINAPI monitor_keys() {
 
             wchar_t* question = get_paper_clip();
             wchar_t* prompt = get_prompt();
-            MessageBoxW(NULL, question, L"Question", MB_OK);
-            MessageBoxW(NULL, prompt, L"Prompt", MB_OK);
-
             LPSTR response = get_gpt_response(prompt, question);
             MessageBoxW(NULL, response, L"Respuesta correcta", MB_OK);
+            post_paper_clip(response);
 
             if (response != NULL) {
                 if (respuesta) {
-
                     free(respuesta);
                 }
-                respuesta = (char*)malloc(strlen(response) + 1);
-                if (respuesta) {
-                    strcpy(respuesta, response);
-                }
 
+                respuesta = (wchar_t*)malloc((wcslen(response) + 1) * sizeof(wchar_t));
                 if (respuesta) {
+                    wcscpy(respuesta, response);
+
                     post_paper_clip(respuesta);
                 }
 
                 free(question);
             }
-            
 
-            // Actualiza el tiempo de la última vez que se presionó el atajo
+
+
             last_hotkey_time = current_time;
 
-            // Evita múltiples pulsaciones mientras se mantiene el atajo
             while ((GetAsyncKeyState('0') & 0x8000) &&
                 (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
                 (GetAsyncKeyState(VK_MENU) & 0x8000)) {
-                Sleep(1000); // Espera 1 segundo
+                Sleep(1000);
             }
         }
 
-        Sleep(50); // Espera 50 ms antes de volver a verificar las teclas
+        Sleep(50);
     }
 
-    // Libera la memoria al finalizar el hilo
     if (respuesta) {
         free(respuesta);
     }
 
     return 0;
 }
+
 
 
 wchar_t* GetSelectedPromptMode() {
@@ -137,8 +121,9 @@ wchar_t* GetSelectedPromptMode() {
         return NULL;
     }
 
-    wchar_t buffer[100];
+    wchar_t buffer[101];
     SendMessage(hPromptModeComboBox, CB_GETLBTEXT, index, (LPARAM)buffer);
+    buffer[100] = L'\0';
 
     if (wcslen(buffer) == 0) {
         MessageBoxW(NULL, L"No se obtuvo texto del ComboBox", L"Error", MB_OK);

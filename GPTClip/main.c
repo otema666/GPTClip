@@ -76,7 +76,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     if (!hWnd) {
         return FALSE;
     }
-
+	CenterWindow(hWnd);
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
