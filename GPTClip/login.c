@@ -12,7 +12,7 @@ HWND hUsernameInput;
 HWND hPasswordInput;
 HINSTANCE hInst;
 BOOL isLoginSuccessful = FALSE;
-char loggedInUsername[USERNAME_LEN] = "";  // Definición de la variable
+char loggedInUsername[USERNAME_LEN] = "";
 
 void CenterWindow(HWND hWnd) {
     RECT rc;
@@ -223,5 +223,5 @@ BOOL loginRequest(const char* username, const char* password) {
     WinHttpCloseHandle(hConnect);
     WinHttpCloseHandle(hSession);
 
-    return TRUE;
+    return isLoginSuccessful;
 }

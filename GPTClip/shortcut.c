@@ -7,6 +7,7 @@
 #include "shortcut.h"
 #include "ui.h"
 #include "prompts/prompts.h"
+#include "notifications.h"
 #pragma warning(disable : 4996)
 
 wchar_t* respuesta = NULL;
@@ -68,12 +69,11 @@ DWORD WINAPI monitor_keys() {
         if ((GetAsyncKeyState('0') & 0x8000) &&
             (GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
             (GetAsyncKeyState(VK_MENU) & 0x8000) &&
-            difftime(current_time, last_hotkey_time) >= 10) {
+            difftime(current_time, last_hotkey_time) >= 7) {
 
             wchar_t* question = get_paper_clip();
             wchar_t* prompt = get_prompt();
             LPSTR response = get_gpt_response(prompt, question);
-            MessageBoxW(NULL, response, L"Respuesta correcta", MB_OK);
             post_paper_clip(response);
 
             if (response != NULL) {
@@ -84,8 +84,8 @@ DWORD WINAPI monitor_keys() {
                 respuesta = (wchar_t*)malloc((wcslen(response) + 1) * sizeof(wchar_t));
                 if (respuesta) {
                     wcscpy(respuesta, response);
-
                     post_paper_clip(respuesta);
+					//notificar(respuesta);
                 }
 
                 free(question);
@@ -111,8 +111,6 @@ DWORD WINAPI monitor_keys() {
 
     return 0;
 }
-
-
 
 wchar_t* GetSelectedPromptMode() {
     int index = SendMessage(hPromptModeComboBox, CB_GETCURSEL, 0, 0);

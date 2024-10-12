@@ -133,6 +133,7 @@
     <ClInclude Include="help.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="notifications.h" />
     <ClInclude Include="prompts\prompts.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="shortcut.h" />
