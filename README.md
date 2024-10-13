@@ -8,6 +8,8 @@
 
 This application allows you to use ChatGPT discreetly. It works by copying text to the clipboard, then pressing **Ctrl + Alt + 0**, which sends a request to a server that has an API for ChatGPT. The response is retrieved from the server and automatically pasted back into the clipboard. This seamless flow makes interacting with ChatGPT quick and invisible, allowing for an efficient workflow without opening additional windows or tabs.
 
+---
+
 ### Key Features
 1. **Clipboard Monitoring**: The app monitors the clipboard and captures the copied text to be sent as a prompt to ChatGPT.
 2. **Hotkey Activation**: Press **Ctrl + Alt + 0** to trigger the request to ChatGPT, instantly sending the clipboard content for processing.
@@ -19,6 +21,7 @@ This application allows you to use ChatGPT discreetly. It works by copying text 
    - Selecting the type of response (e.g., multiple-choice or long-form answers).
    - Enabling or disabling notifications.
 
+---
 
 ### Graphical User Interface (GUI)
 
@@ -36,12 +39,24 @@ The GUI starts by asking the user to log in, ensuring secure access to the appli
    - **Help**: To provide user assistance and instructions.
 
 
+---
+
+### Acknowledgements
+
+A special thanks to [kkai](https://github.com/Kkaiyuanwg) for creating the app icon. Your contribution has greatly enhanced the visual appeal of the application.
+
+---
+
 ### API Integration
 
 This application leverages an API that is possible thanks to the repository at [Duck Chat](https://github.com/mrgick/duck_chat). A huge thanks goes out to mrgick, the creator of this repository for making it possible to integrate the ChatGPT functionality. The API used is written in Python and handles the communication with ChatGPT through the server.
 
-#### Login Process
+---
+
+### Login Process
 The login functionality is managed by making a request to a PHP script hosted on the server. This script checks the user's credentials against a database. The database setup is included in the repository and can be found in the `sql/database.sql` file. This makes it easy to manage user authentication and data securely.
+
+---
 
 ### Windows-Only Compatibility
 
