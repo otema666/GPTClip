@@ -6,6 +6,7 @@
 #include "updater.h"
 #include "shortcut.h"
 #include "help.h"
+#include "logout.h"
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -70,8 +71,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance) {
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow) {
     hInst = hInstance;
 
-    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU,
         CW_USEDEFAULT, 0, 450, 430, NULL, NULL, hInstance, NULL);
+
 
     if (!hWnd) {
         return FALSE;
@@ -127,8 +129,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
 
     case WM_DESTROY:
-        RemoveTrayIcon(); // Función en `tray.c`
-        PostQuitMessage(0);
+        logoutRequest(loggedInUsername);
+		RemoveTrayIcon(); // Función en `tray.c`
+		PostQuitMessage(0);
         break;
 
     case WM_TRAYICON:

@@ -132,6 +132,7 @@
     <ClInclude Include="GPTClip.h" />
     <ClInclude Include="help.h" />
     <ClInclude Include="login.h" />
+    <ClInclude Include="logout.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="notifications.h" />
     <ClInclude Include="prompts\prompts.h" />
@@ -146,6 +147,7 @@
     <ClCompile Include="api.c" />
     <ClCompile Include="help.c" />
     <ClCompile Include="login.c" />
+    <ClCompile Include="logout.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="notifications.c" />
     <ClCompile Include="prompts\prompts.c" />

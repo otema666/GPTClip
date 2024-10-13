@@ -57,6 +57,9 @@
     <ClInclude Include="notifications.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="logout.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -87,6 +90,9 @@
       <Filter>Archivos de origen</Filter>
     </ClCompile>
     <ClCompile Include="help.c">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="logout.c">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>

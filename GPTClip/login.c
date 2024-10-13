@@ -94,8 +94,8 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
     case WM_COMMAND:
         if (LOWORD(wParam) == ID_LOGIN_BUTTON) {
-			EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), FALSE);
-			SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Verificando...");
+            EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), FALSE);
+            SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Verificando...");
             wchar_t username[USERNAME_LEN];
             wchar_t password[PASSWORD_LEN];
 
@@ -104,17 +104,18 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
             char usernameChar[USERNAME_LEN];
             char passwordChar[PASSWORD_LEN];
+            char errorMsg[256]; // Para almacenar el mensaje de error
 
             WideCharToMultiByte(CP_UTF8, 0, username, -1, usernameChar, USERNAME_LEN, NULL, NULL);
             WideCharToMultiByte(CP_UTF8, 0, password, -1, passwordChar, PASSWORD_LEN, NULL, NULL);
 
-            if (loginRequest(usernameChar, passwordChar)) {
+            if (loginRequest(usernameChar, passwordChar, errorMsg)) {
                 isLoginSuccessful = TRUE;
                 PostMessage(hWnd, WM_CLOSE, 0, 0);
                 return 0;
             }
             else {
-                MessageBox(hWnd, L"Verifica tu nombre de usuario y contraseña y vuelva a intentarlo", L"Credenciales incorrectas", MB_OK | MB_ICONERROR);
+                MessageBoxA(hWnd, errorMsg, "Error de inicio de sesión", MB_OK | MB_ICONERROR);
                 EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), TRUE);
                 SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Iniciar sesión");
             }
@@ -133,7 +134,7 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
     return 0;
 }
 
-BOOL loginRequest(const char* username, const char* password) {
+BOOL loginRequest(const char* username, const char* password, char* errorMsg) {
     HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
     BOOL isLoginSuccessful = FALSE;
     DWORD dwSize = 0;
@@ -144,20 +145,20 @@ BOOL loginRequest(const char* username, const char* password) {
 
     hSession = WinHttpOpen(L"gptClip", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (!hSession) {
-        MessageBox(NULL, L"Error al iniciar la sesión HTTP", L"Error", MB_OK | MB_ICONERROR);
+        strcpy(errorMsg, "Error al iniciar la sesión HTTP");
         return FALSE;
     }
 
     hConnect = WinHttpConnect(hSession, L"otema666.ddns.net", INTERNET_DEFAULT_HTTPS_PORT, 0);
     if (!hConnect) {
-        MessageBox(NULL, L"Error al conectar con el servidor", L"Error", MB_OK | MB_ICONERROR);
+        strcpy(errorMsg, "Error al conectar con el servidor");
         WinHttpCloseHandle(hSession);
         return FALSE;
     }
 
     hRequest = WinHttpOpenRequest(hConnect, L"POST", L"/gptClip/login.php", NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
     if (!hRequest) {
-        MessageBox(NULL, L"No se pudo abrir la solicitud HTTP", L"Error", MB_OK | MB_ICONERROR);
+        strcpy(errorMsg, "No se pudo abrir la solicitud HTTP");
         WinHttpCloseHandle(hConnect);
         WinHttpCloseHandle(hSession);
         return FALSE;
@@ -170,10 +171,10 @@ BOOL loginRequest(const char* username, const char* password) {
     if (!bResults) {
         DWORD errorCode = GetLastError();
         if (errorCode == ERROR_WINHTTP_CANNOT_CONNECT) {
-            MessageBox(NULL, L"No se pudo conectar al servidor. Revisa tu conexión a Internet.", L"Error de conexión", MB_OK | MB_ICONERROR);
+            strcpy(errorMsg, "No se pudo conectar al servidor. Revisa tu conexión a Internet.");
         }
         else {
-            MessageBox(NULL, L"Error al enviar la solicitud HTTP", L"Error", MB_OK | MB_ICONERROR);
+            strcpy(errorMsg, "Error al enviar la solicitud HTTP");
         }
         WinHttpCloseHandle(hRequest);
         WinHttpCloseHandle(hConnect);
@@ -186,21 +187,21 @@ BOOL loginRequest(const char* username, const char* password) {
         do {
             dwSize = 0;
             if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-                MessageBox(NULL, L"Error al consultar datos disponibles", L"Error", MB_OK | MB_ICONERROR);
+                strcpy(errorMsg, "Error al consultar datos disponibles");
                 break;
             }
 
             if (dwSize > 0) {
                 pszOutBuffer = (LPSTR)malloc(dwSize + 1);
                 if (!pszOutBuffer) {
-                    MessageBox(NULL, L"Error de memoria", L"Error", MB_OK | MB_ICONERROR);
+                    strcpy(errorMsg, "Error de memoria");
                     break;
                 }
 
                 ZeroMemory(pszOutBuffer, dwSize + 1);
 
                 if (!WinHttpReadData(hRequest, (LPVOID)pszOutBuffer, dwSize, &dwDownloaded)) {
-                    MessageBox(NULL, L"Error al leer los datos", L"Error", MB_OK | MB_ICONERROR);
+                    strcpy(errorMsg, "Error al leer los datos");
                 }
                 else {
                     pszOutBuffer[dwSize] = '\0';
@@ -209,8 +210,17 @@ BOOL loginRequest(const char* username, const char* password) {
                         isLoginSuccessful = TRUE;
                         strncpy(loggedInUsername, username, USERNAME_LEN);
                     }
+                    else if (strstr(pszOutBuffer, "\"status\":\"user_not_found\"")) {
+                        strcpy(errorMsg, "Usuario no encontrado");
+                    }
+                    else if (strstr(pszOutBuffer, "\"status\":\"password_error\"")) {
+                        strcpy(errorMsg, "Contraseña incorrecta");
+                    }
+                    else if (strstr(pszOutBuffer, "\"status\":\"already_logged_in\"")) {
+                        strcpy(errorMsg, "Ya has iniciado sesión con esta cuenta");
+                    }
                     else {
-                        isLoginSuccessful = FALSE;
+                        strcpy(errorMsg, "Error desconocido");
                     }
                 }
 
