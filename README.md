@@ -1,5 +1,8 @@
 # GPTClip
 
+<p align="center">
+   <img src="GPTClip/images/gpt_icon.png" alt="Application Screenshot">
+</p>
 
 ### Overview
 
