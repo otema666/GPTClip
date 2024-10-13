@@ -1,4 +1,4 @@
-# GPTCLip
+# GPTClip
 
 
 ### Overview
