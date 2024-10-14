@@ -19,6 +19,7 @@ HWND hHelpButton;
 HWND hSeleccionButton;
 HWND hSeleccionHelpButton;
 
+
 HINSTANCE hInst;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -134,6 +135,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 EnableWindow(hSeleccionHelpButton, FALSE);
                 launch_helpSeleccion_img();
                 EnableWindow(hSeleccionHelpButton, TRUE);
+
+            }
+            else if ((HWND)lParam == hInputBoxButton) {
+                EnableWindow(hInputBoxButton, FALSE);
+                EnableWindow(hInputBoxButton, TRUE);
+                SetWindowText(hInputBoxButton, L"Copiado!");
+                inputBox();
+                Sleep(1000);
+                SetWindowText(hInputBoxButton, L"Caja de texto");
+            }
+            else if ((HWND)lParam == hInputBoxHelpButton) {
+                EnableWindow(hInputBoxHelpButton, FALSE);
+                launch_InputBox_img();
+                EnableWindow(hInputBoxHelpButton, TRUE);
 
             }
             else {
