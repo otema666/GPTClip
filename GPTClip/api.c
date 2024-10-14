@@ -8,41 +8,80 @@
 #define SERVER_PORT 443
 #pragma warning(disable : 4996)
 
+wchar_t* url_encode(const wchar_t* src) {
+    size_t len = wcslen(src);
+    wchar_t* encoded = (wchar_t*)malloc(len * 3 * sizeof(wchar_t)); // tamaño suficiente para caracteres codificados
+    if (!encoded) return NULL;
+
+    wchar_t* dst = encoded;
+    for (size_t i = 0; i < len; i++) {
+        if (iswalnum(src[i])) {
+            *dst++ = src[i];
+        }
+        else {
+            // Codifica el carácter como %XX
+            swprintf(dst, 4, L"%%%02X", src[i]);
+            dst += 3;
+        }
+    }
+    *dst = L'\0';  // Terminador nulo
+
+    return encoded;
+}
+
 LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     HINTERNET hSession = NULL, hConnect = NULL, hRequest = NULL;
     BOOL bResults = FALSE;
     DWORD dwSize = 0;
     DWORD dwDownloaded = 0;
     LPSTR pszOutBuffer = NULL;
-    DWORD dwStatusCode = 0;
-    DWORD dwStatusCodeSize = sizeof(dwStatusCode);
     wchar_t* response = NULL;
     size_t responseLen = 0;
 
-    size_t prompt_len = wcslen(prompt);
-    size_t question_len = wcslen(question);
-    size_t total_len = prompt_len + question_len + wcslen(L"gptClip/gptApi.php?prompt=&question=") + 1;
+    wchar_t* headers = L"Content-Type: application/x-www-form-urlencoded";
+    wchar_t* postDataFormat = L"prompt=%s&question=%s";
 
-    wchar_t* path = (wchar_t*)malloc(total_len * sizeof(wchar_t));
-    if (path == NULL) {
-        MessageBox(NULL, L"Error al asignar memoria.", L"Error de asignación memoria", MB_OK | MB_ICONERROR);
+    // Codificar los parámetros prompt y question
+    wchar_t* encodedPrompt = url_encode(prompt);
+    wchar_t* encodedQuestion = url_encode(question);
+
+    if (!encodedPrompt || !encodedQuestion) {
+        MessageBox(NULL, L"Error al codificar los datos.", L"Error", MB_OK | MB_ICONERROR);
+        free(encodedPrompt);
+        free(encodedQuestion);
         return NULL;
     }
 
-    swprintf(path, total_len, L"gptClip/gptApi.php?prompt=%ls&question=%ls", prompt, question);
+    size_t total_len = wcslen(encodedPrompt) + wcslen(encodedQuestion) + wcslen(L"prompt=&question=") + 1;
+    wchar_t* postData = (wchar_t*)malloc(total_len * sizeof(wchar_t));
+    if (postData == NULL) {
+        MessageBox(NULL, L"Error al asignar memoria para el cuerpo de la solicitud.", L"Error de asignación", MB_OK | MB_ICONERROR);
+        free(encodedPrompt);
+        free(encodedQuestion);
+        return NULL;
+    }
+
+    // Crear el cuerpo de datos
+    swprintf(postData, total_len, postDataFormat, encodedPrompt, encodedQuestion);
+
+    // Convertir el cuerpo a UTF-8 antes de enviarlo
+    int postDataSize = WideCharToMultiByte(CP_UTF8, 0, postData, -1, NULL, 0, NULL, NULL);
+    char* postDataUTF8 = (char*)malloc(postDataSize);
+    WideCharToMultiByte(CP_UTF8, 0, postData, -1, postDataUTF8, postDataSize, NULL, NULL);
 
     hSession = WinHttpOpen(L"gptClip", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
 
     if (hSession) {
-        hConnect = WinHttpConnect(hSession, SERVER_NAME, SERVER_PORT, 0);
+        hConnect = WinHttpConnect(hSession, L"otema666.ddns.net", 443, 0);
     }
 
     if (hConnect) {
-        hRequest = WinHttpOpenRequest(hConnect, L"GET", path, NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
+        hRequest = WinHttpOpenRequest(hConnect, L"POST", L"/gptClip/gptApi.php", NULL, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
     }
 
     if (hRequest) {
-        bResults = WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0);
+        // Enviar los datos en formato UTF-8
+        bResults = WinHttpSendRequest(hRequest, headers, (DWORD)-1, postDataUTF8, postDataSize - 1, postDataSize - 1, 0);
     }
 
     if (bResults) {
@@ -50,10 +89,6 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     }
 
     if (bResults) {
-        WinHttpQueryHeaders(hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER, NULL, &dwStatusCode, &dwStatusCodeSize, NULL);
-    }
-
-    if (dwStatusCode == 200) {
         do {
             if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
                 MessageBox(NULL, L"Error al consultar los datos disponibles.", L"Error de datos", MB_OK | MB_ICONERROR);
@@ -105,7 +140,6 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
                 free(pszOutBuffer);
             }
         } while (dwSize > 0);
-
     }
     else {
         MessageBox(NULL, L"No se pudo conectar con el servidor.", L"Error", MB_OK | MB_ICONERROR);
@@ -114,7 +148,11 @@ LPWSTR get_gpt_response(LPCWSTR prompt, LPCWSTR question) {
     if (hRequest) WinHttpCloseHandle(hRequest);
     if (hConnect) WinHttpCloseHandle(hConnect);
     if (hSession) WinHttpCloseHandle(hSession);
-    free(path);
+    free(postData);
+    free(postDataUTF8);
+    free(encodedPrompt);
+    free(encodedQuestion);
 
     return response;
 }
+
