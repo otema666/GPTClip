@@ -16,6 +16,8 @@ HWND hSendNotificationsCheck, hMinimizeToTrayCheck, hShortcutInput, hPromptModeC
 HWND hStartButton;
 HWND hExitButton;
 HWND hHelpButton;
+HWND hSeleccionButton;
+HWND hSeleccionHelpButton;
 
 HINSTANCE hInst;
 
@@ -120,11 +122,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				EnableWindow(hHelpButton, TRUE);
 
             }
+            else if ((HWND)lParam == hSeleccionButton) {
+                EnableWindow(hSeleccionButton, FALSE);
+                EnableWindow(hSeleccionButton, TRUE);
+                SetWindowText(hSeleccionButton, L"Copiado!");
+                seleccionOculta();
+                Sleep(1000);
+                SetWindowText(hSeleccionButton, L"Selección oculta");
+            }
+            else if ((HWND)lParam == hSeleccionHelpButton) {
+                EnableWindow(hSeleccionHelpButton, FALSE);
+                launch_helpSeleccion_img();
+                EnableWindow(hSeleccionHelpButton, TRUE);
+
+            }
             else {
                 HandleTrayMenuCommand(wParam, hWnd);
             }
         }
+        if (HIWORD(wParam) == CBN_SELCHANGE) {
+            int selectedIndex = SendMessage(hPromptModeComboBox, CB_GETCURSEL, 0, 0);
+            if (selectedIndex == 1) {
+                EnableWindow(hSendNotificationsCheck, TRUE);
+            }
+            else {
+                EnableWindow(hSendNotificationsCheck, FALSE);
+                SendMessage(hSendNotificationsCheck, BM_SETCHECK, BST_UNCHECKED, 0);
 
+            }
+        }
         break;
 
 

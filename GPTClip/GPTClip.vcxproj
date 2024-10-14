@@ -162,6 +162,8 @@
   <ItemGroup>
     <Image Include="res\gpt_icon.ico" />
     <Image Include="res\login.ico" />
+    <Image Include="res\mostrar.ico" />
+    <Image Include="res\salir.ico" />
     <Image Include="res\update.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -6,6 +6,8 @@
 HWND hStartButton;
 HWND hExitButton;
 HWND hHelpButton;
+HWND hSeleccionButton;
+HWND hSeleccionHelpButton;
 
 void CreateUI(HWND hWnd) {
     HBRUSH hBrush = CreateSolidBrush(RGB(240, 240, 240));
@@ -20,6 +22,7 @@ void CreateUI(HWND hWnd) {
     hSendNotificationsCheck = CreateWindowW(L"BUTTON", L"Enviar notificaciones",
         WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX | BS_NOTIFY,
         10, 110, 150, 20, hWnd, NULL, hInst, NULL);
+    EnableWindow(hSendNotificationsCheck, FALSE);
 
     CreateWindowW(L"STATIC", L"Atajo del teclado:", WS_VISIBLE | WS_CHILD,
         10, 40, 120, 20, hWnd, NULL, hInst, NULL);
@@ -47,7 +50,13 @@ void CreateUI(HWND hWnd) {
     hExitButton = CreateWindowW(L"BUTTON", L"Salir",
         WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
         230, 330, 100, 30, hWnd, NULL, hInst, NULL);
-	hHelpButton = CreateWindowW(L"BUTTON", L"Ayuda",
-		WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
-		10, 160, 70, 20, hWnd, NULL, hInst, NULL);
+    hSeleccionButton = CreateWindowW(L"BUTTON", L"Selección oculta",
+        WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
+        10, 140, 120, 20, hWnd, NULL, hInst, NULL);
+    hSeleccionHelpButton = CreateWindowW(L"BUTTON", L"?",
+        WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
+        150, 140, 20, 20, hWnd, NULL, hInst, NULL);
+    hHelpButton = CreateWindowW(L"BUTTON", L"Ayuda",
+        WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
+        10, 180, 70, 20, hWnd, NULL, hInst, NULL);
 }

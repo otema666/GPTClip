@@ -17,5 +17,5 @@ extern char loggedInUsername[USERNAME_LEN];
 LRESULT CALLBACK LoginWndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL loginRequest(const char* username, const char* password, char* errorMsg);
 void CenterWindow(HWND hWnd);
-
+void CreateLoginWindow(HINSTANCE hInstance);
 #endif // LOGIN_H

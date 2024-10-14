@@ -38,6 +38,11 @@ wchar_t* get_paper_clip() {
     return clipContent;
 }
 
+void seleccionOculta() {
+    const wchar_t* script = L"document.head.appendChild(Object.assign(document.createElement('style'), { textContent: '::selection { background: rgba(0, 179, 255, 0.09); color: inherit; }' }));";
+	post_paper_clip(script);
+}
+
 void post_paper_clip(const wchar_t* text) {
     if (OpenClipboard(NULL)) {
         EmptyClipboard();
@@ -74,7 +79,7 @@ DWORD WINAPI monitor_keys() {
             wchar_t* question = get_paper_clip();
             wchar_t* prompt = get_prompt();
             LPSTR response = get_gpt_response(prompt, question);
-            post_paper_clip(response);
+            //post_paper_clip(response);
 
             if (response != NULL) {
                 if (respuesta) {
@@ -85,7 +90,9 @@ DWORD WINAPI monitor_keys() {
                 if (respuesta) {
                     wcscpy(respuesta, response);
                     post_paper_clip(respuesta);
-					//notificar(respuesta);
+                    if (SendMessage(hSendNotificationsCheck, BM_GETCHECK, 0, 0) == BST_CHECKED) {
+                        notificar(respuesta);
+                    }
                 }
 
                 free(question);

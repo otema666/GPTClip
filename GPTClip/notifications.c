@@ -9,7 +9,7 @@ void notificar(wchar_t* str) {
     nid.uFlags = NIF_INFO;
 
     wcscpy_s(nid.szInfo, sizeof(nid.szInfo) / sizeof(nid.szInfo[0]), str);
-    wcscpy_s(nid.szInfoTitle, sizeof(nid.szInfoTitle) / sizeof(nid.szInfoTitle[0]), L"Notificación");
+    wcscpy_s(nid.szInfoTitle, sizeof(nid.szInfoTitle) / sizeof(nid.szInfoTitle[0]), L"Respuesta:");
     nid.dwInfoFlags = NIIF_INFO;
 
     Shell_NotifyIcon(NIM_ADD, &nid);
