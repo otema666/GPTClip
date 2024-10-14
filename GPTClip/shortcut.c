@@ -98,8 +98,6 @@ DWORD WINAPI monitor_keys() {
                 free(question);
             }
 
-
-
             last_hotkey_time = current_time;
 
             while ((GetAsyncKeyState('0') & 0x8000) &&
@@ -145,7 +143,10 @@ wchar_t* get_prompt() {
     }
     else if (wcscmp(promptMode, L"Examen tipo desarrollo (Respuestas más largas)") == 0) {
         return prompt_LongAnswer;
-    }
+	}
+	else if (wcscmp(promptMode, L"Desactivar prompt") == 0) {
+		return no_prompt;
+	}
     else {
         MessageBoxW(NULL, L"Seleccione un modo de solicitud válido", L"Prompt error", MB_ICONERROR | MB_OK);
         return L"no hay";

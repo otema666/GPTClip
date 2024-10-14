@@ -1,5 +1,6 @@
 #include <string.h>
 #include "prompts.h"
 
-const wchar_t* prompt_test = L"Analiza el siguiente problema tipo test y determina cuál es la respuesta correcta. Recuerda que solo puedes responder con la letra correspondiente a la respuesta correcta.Si las respuestas no están enumeradas, identifica las diferentes opciones y asígnales letras(A, B, C, D, etc.) según tu criterio.\nProblema:\n";
+const wchar_t* prompt_test = L"Analiza detalladamente el siguiente problema tipo test y determina cuál es la respuesta correcta. Tu formato de respuesta será así: letra_correcta + ) + identificacion_respuesta, por lo que no dirás cual es el procedimiento de resolución.\nEste es el Problema:\n";
 const wchar_t* prompt_LongAnswer = L"Analiza el siguiente problema y escribe una respuesta detallada y completa. Recuerda que la respuesta debe ser coherente y estar bien redactada.\nProblema:\n";
+const wchar_t* no_prompt = L"";

@@ -37,6 +37,7 @@ void CreateUI(HWND hWnd) {
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"--Seleccionar--");
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Examen tipo test (Respuesta Múltiple)");
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Examen tipo desarrollo (Respuestas más largas)");
+    SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Desactivar prompt (Respuestas Normales)");
     SendMessage(hPromptModeComboBox, CB_SETCURSEL, 0, 0);
 
     HFONT hFont = CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, 0, L"Segoe UI");
