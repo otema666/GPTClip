@@ -168,6 +168,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
         }
         break;
 
+    case WM_QUERYENDSESSION:
+        logoutRequest(loggedInUsername);
+        return TRUE;
+
+    case WM_ENDSESSION:
+        if (wParam) {
+            PostQuitMessage(0);
+        }
+        break;
 
     case WM_DESTROY:
         logoutRequest(loggedInUsername);
