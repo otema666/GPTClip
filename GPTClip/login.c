@@ -77,22 +77,19 @@ void CreateLoginWindow(HINSTANCE hInstance) {
 LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
     case WM_CREATE:
-        CreateWindowW(L"STATIC", L"Usuario:", WS_VISIBLE | WS_CHILD,
+        CreateWindowW(L"STATIC", L"Usuario:", WS_VISIBLE | WS_CHILD | WS_GROUP,
             20, 20, 80, 20, hWnd, NULL, hInst, NULL);
         hUsernameInput = CreateWindowW(L"EDIT", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | WS_TABSTOP | ES_AUTOHSCROLL,
             110, 20, 150, 20, hWnd, (HMENU)ID_USERNAME, hInst, NULL);
 
-        CreateWindowW(L"STATIC", L"Contraseña:", WS_VISIBLE | WS_CHILD,
+        CreateWindowW(L"STATIC", L"Contraseña:", WS_VISIBLE | WS_CHILD | WS_GROUP,
             20, 60, 80, 20, hWnd, NULL, hInst, NULL);
         hPasswordInput = CreateWindowW(L"EDIT", L"", WS_VISIBLE | WS_CHILD | WS_BORDER | ES_PASSWORD | WS_TABSTOP | ES_AUTOHSCROLL,
             110, 60, 150, 20, hWnd, (HMENU)ID_PASSWORD, hInst, NULL);
 
         HWND hLoginButton = CreateWindowW(L"BUTTON", L"Iniciar sesión", WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON | WS_TABSTOP,
             110, 100, 150, 30, hWnd, (HMENU)ID_LOGIN_BUTTON, hInst, NULL);
-
         SendMessage(hLoginButton, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
-
-        SetFocus(hUsernameInput); // Enfoca el campo de usuario al inicio
         break;
 
     case WM_COMMAND:
@@ -107,7 +104,7 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
 
             char usernameChar[USERNAME_LEN];
             char passwordChar[PASSWORD_LEN];
-            char errorMsg[256];
+            char errorMsg[256]; // Para almacenar el mensaje de error
 
             WideCharToMultiByte(CP_UTF8, 0, username, -1, usernameChar, USERNAME_LEN, NULL, NULL);
             WideCharToMultiByte(CP_UTF8, 0, password, -1, passwordChar, PASSWORD_LEN, NULL, NULL);
@@ -122,17 +119,6 @@ LRESULT CALLBACK LoginWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
                 EnableWindow(GetDlgItem(hWnd, ID_LOGIN_BUTTON), TRUE);
                 SetWindowText(GetDlgItem(hWnd, ID_LOGIN_BUTTON), L"Iniciar sesión");
             }
-        }
-        break;
-
-    case WM_KEYDOWN:
-        if (wParam == VK_RETURN) {
-            // Si la tecla Enter está presionada, envía el evento como si se hubiera presionado el botón
-            SendMessage(hWnd, WM_COMMAND, MAKEWPARAM(ID_LOGIN_BUTTON, BN_CLICKED), 0);
-        }
-        else if (wParam == VK_TAB) {
-            // Si se presiona Tab, mueve el foco al siguiente control
-            SetFocus(GetNextDlgTabItem(hWnd, GetFocus(), FALSE));
         }
         break;
 
