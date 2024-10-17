@@ -11,3 +11,5 @@ void AddTrayIcon(HWND hWnd);
 void RemoveTrayIcon();
 void ShowContextMenu(HWND hWnd, POINT pt);
 void HandleTrayMenuCommand(WPARAM wParam, HWND hWnd);
+wchar_t* GetSelectedPromptMode();
+int currentPromptSelection();

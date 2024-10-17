@@ -35,7 +35,7 @@ void CreateUI(HWND hWnd) {
         10, 80, 140, 20, hWnd, NULL, hInst, NULL);
     hPromptModeComboBox = CreateWindowW(L"COMBOBOX", NULL,
         WS_VISIBLE | WS_CHILD | CBS_DROPDOWNLIST | WS_EX_COMPOSITED,
-        150, 80, 260, 100, hWnd, NULL, hInst, NULL);
+        150, 80, 270, 100, hWnd, NULL, hInst, NULL);
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"--Seleccionar--");
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Examen tipo test (Respuesta Múltiple)");
     SendMessage(hPromptModeComboBox, CB_ADDSTRING, 0, (LPARAM)L"Examen tipo desarrollo (Respuestas más largas)");

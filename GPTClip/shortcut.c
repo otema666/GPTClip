@@ -8,6 +8,7 @@
 #include "ui.h"
 #include "prompts/prompts.h"
 #include "notifications.h"
+#include "tray.h"
 #pragma warning(disable : 4996)
 
 wchar_t* respuesta = NULL;
@@ -122,25 +123,6 @@ DWORD WINAPI monitor_keys() {
     return 0;
 }
 
-wchar_t* GetSelectedPromptMode() {
-    int index = SendMessage(hPromptModeComboBox, CB_GETCURSEL, 0, 0);
-    if (index == CB_ERR) {
-        MessageBoxW(NULL, L"Error al obtener el índice del ComboBox", L"Error", MB_OK);
-        return NULL;
-    }
-
-    wchar_t buffer[101];
-    SendMessage(hPromptModeComboBox, CB_GETLBTEXT, index, (LPARAM)buffer);
-    buffer[100] = L'\0';
-
-    if (wcslen(buffer) == 0) {
-        MessageBoxW(NULL, L"No se obtuvo texto del ComboBox", L"Error", MB_OK);
-        return NULL;
-    }
-
-    return wcsdup(buffer);
-}
-
 wchar_t* get_prompt() {
     wchar_t* promptMode = GetSelectedPromptMode();
     if (wcscmp(promptMode, L"Examen tipo test (Respuesta Múltiple)") == 0) {
@@ -148,10 +130,10 @@ wchar_t* get_prompt() {
     }
     else if (wcscmp(promptMode, L"Examen tipo desarrollo (Respuestas más largas)") == 0) {
         return prompt_LongAnswer;
-	}
-	else if (wcscmp(promptMode, L"Desactivar prompt") == 0) {
-		return no_prompt;
-	}
+    }
+    else if (wcscmp(promptMode, L"Desactivar prompt (Respuestas Normales)") == 0) {
+        return no_prompt;
+    }
     else {
         MessageBoxW(NULL, L"Seleccione un modo de solicitud válido", L"Prompt error", MB_ICONERROR | MB_OK);
         return L"no hay";

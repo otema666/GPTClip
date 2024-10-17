@@ -4,8 +4,13 @@
 //
 #define IDC_MYICON                      2
 #define IDD_GPTCLIP_DIALOG              102
+#define IDM_PROMPT_TEST                 102
 #define IDS_APP_TITLE                   103
+#define IDM_PROMPT_DEV                  103
 #define IDM_ABOUT                       104
+#define IDM_PROMPT_OFF                  104
+#define IDM_SHOW                        105
+#define IDM_EXIT                        106
 #define IDC_GPTCLIP                     109
 #define IDR_MAINFRAME                   128
 #define IDI_ICON1                       129
@@ -18,7 +23,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        133
+#define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32773
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           110
