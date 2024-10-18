@@ -145,12 +145,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
                 Sleep(1000);
                 SetWindowText(hInputBoxButton, L"Caja de texto");
             }
-            else if ((HWND)lParam == hInputBoxHelpButton) {
-                EnableWindow(hInputBoxHelpButton, FALSE);
-                launch_InputBox_img();
-                EnableWindow(hInputBoxHelpButton, TRUE);
-
-            }
             else {
                 HandleTrayMenuCommand(wParam, hWnd);
             }

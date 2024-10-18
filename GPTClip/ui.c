@@ -9,7 +9,6 @@ HWND hHelpButton;
 HWND hSeleccionButton;
 HWND hSeleccionHelpButton;
 HWND hInputBoxButton;
-HWND hInputBoxHelpButton;
 
 void CreateUI(HWND hWnd) {
     HBRUSH hBrush = CreateSolidBrush(RGB(240, 240, 240));
@@ -62,9 +61,6 @@ void CreateUI(HWND hWnd) {
 	hInputBoxButton = CreateWindowW(L"BUTTON", L"Caja de texto",
 		WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
 		10, 170, 120, 20, hWnd, NULL, hInst, NULL);
-	hInputBoxHelpButton = CreateWindowW(L"BUTTON", L"?",
-		WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
-		150, 170, 20, 20, hWnd, NULL, hInst, NULL);
     hHelpButton = CreateWindowW(L"BUTTON", L"Ayuda",
         WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON | BS_NOTIFY,
         10, 200, 70, 20, hWnd, NULL, hInst, NULL);

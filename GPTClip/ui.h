@@ -5,4 +5,3 @@
 void CreateUI(HWND hWnd);
 
 extern HWND hInputBoxButton;
-extern HWND hInputBoxHelpButton;

@@ -61,7 +61,3 @@ void launch_help_img() {
 void launch_helpSeleccion_img() {
     launch_help_image("https://otema666.ddns.net/gptClip/helpSeleccion.jpg", "HELP.jpg");
 }
-
-void launch_InputBox_img() {
-    launch_help_image("https://otema666.ddns.net/gptClip/helpInputBox.jpg", "HELP.jpg");
-}
