@@ -8,7 +8,7 @@
 
 #pragma comment(lib, "winhttp.lib")
 
-#define APP_VERSION "2.2"
+#define APP_VERSION "2.3"
 #define SERVER_NAME L"otema666.ddns.net"
 #define SERVER_PATH L"gptClip/version.txt"
 #define SERVER_PORT 443
@@ -32,6 +32,8 @@ void check_for_updates() {
     DWORD dwStatusCode = 0;
     DWORD dwStatusCodeSize = sizeof(dwStatusCode);
 
+    int timeout = 3000;
+
     hSession = WinHttpOpen(L"gptClip updater", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
 
     if (hSession) {
@@ -43,6 +45,8 @@ void check_for_updates() {
     }
 
     if (hRequest) {
+        WinHttpSetTimeouts(hRequest, timeout, timeout, timeout, timeout);
+
         bResults = WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0);
     }
 
@@ -56,7 +60,6 @@ void check_for_updates() {
 
     if (dwStatusCode == 200) {
         if (!WinHttpQueryDataAvailable(hRequest, &dwSize)) {
-            CreateErrorWindow(L"");
             MessageBox(NULL, L"Error de red", L"GPTClip Error", MB_OK | MB_ICONERROR);
         }
         else if (dwSize > 0) {
@@ -80,16 +83,17 @@ void check_for_updates() {
             free(pszOutBuffer);
         }
     }
-    else {
-        MessageBox(NULL, L"Necesitas estar conectado a internet!", L"Error de Red", MB_OK | MB_ICONERROR);
+
+    if (!bResults) {
+        MessageBox(NULL, L"El servidor no tiene conexión!", L"Error de Red", MB_OK | MB_ICONERROR);
         exit(1);
     }
 
     if (strcmp(APP_VERSION, server_version) != 0) {
-		wchar_t message[100];
-		swprintf(message, 100, L"La versión % hs está disponible. Por favor, presiona Aceptar para actualizar la app.", server_version);
+        wchar_t message[100];
+        swprintf(message, 100, L"La versión %hs está disponible. Por favor, presiona Aceptar para actualizar la app.", server_version);
 
-		CreateErrorWindow(message);
+        CreateErrorWindow(message);
         exit(1);
     }
 
