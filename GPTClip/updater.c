@@ -8,7 +8,7 @@
 
 #pragma comment(lib, "winhttp.lib")
 
-#define APP_VERSION "2.3"
+#define APP_VERSION "2.3.1"
 #define SERVER_NAME L"otema666.ddns.net"
 #define SERVER_PATH L"gptClip/version.txt"
 #define SERVER_PORT 443
